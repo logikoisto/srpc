@@ -35,12 +35,7 @@ func StartServer(addr *net.TCPAddr) {
 		if eg.pools[i].poller, err = openPoller(); err != nil {
 			panic(err)
 		}
-		// TODO: 这里需要对 连接的注册进行 封装 -> eventPool
-		eg.pools[i].cs = make(map[int]*conn, 0)
-		if err = eg.pools[i].poller.AddRead(svr.fd); err != nil {
-			panic(err)
-		}
-		eg.pools[i].cs[svr.fd] = &conn{}
+		eg.pools[i] = createEventPool(svr.fd)
 	}
 	// TODO:启动 server
 	svr.run()

@@ -14,7 +14,7 @@ type server struct {
 }
 
 // 构建器
-func StartServer(addr *net.TCPAddr) {
+func StartServer(addr *net.TCPAddr, eventHandler EventHandler) {
 	var (
 		err error
 		ln  *net.TCPListener
@@ -35,7 +35,7 @@ func StartServer(addr *net.TCPAddr) {
 		if eg.pools[i].poller, err = openPoller(); err != nil {
 			panic(err)
 		}
-		eg.pools[i] = createEventPool(svr.fd)
+		eg.pools[i] = createEventPool(svr.fd, eventHandler)
 	}
 	// TODO:启动 server
 	svr.run()
@@ -50,5 +50,9 @@ func (c *cleaner) shutDown() {
 	close(c.shutDownChan)
 }
 
-func (srv *server) run() {
+func (svr *server) run() {
+	for i := 0; i < len(svr.epg.pools); i++ {
+		// TODO: 应该传递进去一个上下文
+		go svr.epg.pools[i].run()
+	}
 }

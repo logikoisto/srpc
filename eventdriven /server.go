@@ -37,7 +37,6 @@ func StartServer(addr *net.TCPAddr, eventHandler EventHandler) {
 		}
 		eg.pools[i] = createEventPool(svr.fd, eventHandler)
 	}
-	// TODO:启动 server
 	svr.run()
 }
 
